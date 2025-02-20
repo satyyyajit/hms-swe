@@ -36,9 +36,9 @@ const LoginSection = () => {
                 <p className="mt-2 text-gray-500">
                   Manage room allocation, fee collection
                 </p>
-                <button className="mt-6 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300">
-                  Login
-                </button>
+                <Link className="mt-6 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300" href='/login/admin'>
+                    Login
+                </Link>
               </div>
             </div>
 
