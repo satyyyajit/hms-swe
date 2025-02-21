@@ -1,7 +1,16 @@
-
-import React from 'react'
+'use client'
+import React, { useEffect } from 'react'
 import { BedDoubleIcon, HomeIcon, UtensilsIcon, GraduationCapIcon, MailWarningIcon, Database, CalendarFoldIcon, LucideLogOut } from 'lucide-react'
 import Link from 'next/link';
+
+import { useState } from 'react';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { getUserFromToken } from '@/lib/auth';
+
+
+
+
 
 const Card = ({ title, count, icon: Icon }) => {
     return (
@@ -57,6 +66,9 @@ const QuickActions = () => {
 
 
 const getDashboard = () => {
+
+    
+
     return (
         <>
             <main className='p-4'>
