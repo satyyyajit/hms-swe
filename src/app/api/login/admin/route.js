@@ -53,7 +53,7 @@ export async function POST(req) {
             secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
             sameSite: 'strict', // Prevent CSRF attacks
             maxAge: 60 * 60, // 1 hour (in seconds)
-            path: '/', // Make the cookie available across the entire site
+            path: '/admin', // Make the cookie available across the entire site
         });
 
         // Return response with the cookie header
