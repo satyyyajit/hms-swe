@@ -1,7 +1,8 @@
 'use client';
 
 import { MailIcon, PhoneIcon, HomeIcon, BedDoubleIcon, UsersIcon, CalendarIcon, ClipboardListIcon, AlertTriangleIcon, DollarSignIcon } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const ProfileField = ({ label, value, icon: Icon }) => (
     <div className="flex items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-300">
@@ -16,18 +17,40 @@ const ProfileField = ({ label, value, icon: Icon }) => (
 
 
 const ProfilePage = () => {
+
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        // Fetch student data
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token') || document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+                    const response = await axios.get('/api/student', {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setUser(response.data);
+            }
+            catch (err) {
+                console.log('Error fetching user data:', err);
+    
+            }
+        }
+        fetchUser();
+    }, []);
+
     const student = {
-        name: 'John Doe',
-        registrationNumber: 'VST-001',
-        year: '3rd Year',
-        dateOfBirth: '12-12-2000',
-        email: 'john.doe@example.com',
-        phoneNumber: '+1234567890',
-        parentNumber: '+0987654321',
-        homeTown: 'New York',
-        room: '101',
-        block: 'A',
-        messtype: ['Vegetarian'],
+        name: user?.student.name ,
+        registrationNumber: user?.student.studentId,
+        year: user?.student.year,
+        dateOfBirth: user?.student.dob,
+        email: user?.student.email,
+        phoneNumber: user?.student.phoneNumber,
+        parentNumber: user?.student.parentPhoneNumber,
+        homeTown: user?.student.address,
+        room: user?.student.room || 'Not Assigned',
+        block: user?.student.block || 'Not Assigned',
+        messtype: user?.student.mess || 'Not Assigned',
         pending_fees: [],
         complaints: [],
         attendance: []
@@ -51,7 +74,7 @@ const ProfilePage = () => {
                 <ProfileField label="Hometown" value={student.homeTown} icon={HomeIcon} />
                 <ProfileField label="Room" value={student.room} icon={BedDoubleIcon} />
                 <ProfileField label="Block" value={student.block} icon={HomeIcon} />
-                <ProfileField label="Mess Type" value={student.messtype.join(', ')} icon={UsersIcon} />
+                <ProfileField label="Mess Type" value={student.messtype} icon={UsersIcon} />
                 <ProfileField label="Pending Fees" value={student.pending_fees.length} icon={DollarSignIcon} />
                 <ProfileField label="Complaints" value={student.complaints.length} icon={AlertTriangleIcon} />
                 <ProfileField label="Attendance Records" value={student.attendance.length} icon={ClipboardListIcon} />

@@ -1,77 +1,84 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
+
 
 const studentSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, 'Name is required'],
+        trim: true,
+        minLength: [2, 'Name must be at least 2 characters']
     },
     studentId: {
         type: String,
-        required: true,
-        unique: true
+        required: [true, 'Student ID is required'],
+        unique: true,
+        trim: true
     },
     year: {
         type: Number,
-        required: true
-    },
-    dob: {
-        type: Date,
-        required: true
+        required: true,
     },
     email: {
         type: String,
-        required: true,
-        unique: true
+        required: [true, 'Email is required'],
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
     },
     password: {
+        type: String,
+        required: [true, 'Password is required'],
+    },
+    dob: {
+        type: Date,
+        required: [true, 'Date of birth is required']
+    },
+    gender: {
         type: String,
         required: true
     },
     phoneNumber: {
         type: String,
-        required: true
+        required: [true, 'Phone number is required'],
+        match: [/^\d{10}$/, 'Please enter a valid 10-digit phone number']
     },
-
     parentPhoneNumber: {
         type: String,
-        required: true
+        required: [true, 'Parent phone number is required'],
+        match: [/^\d{10}$/, 'Please enter a valid 10-digit phone number']
     },
     address: {
         type: String,
-        required: true
+        required: [true, 'Address is required'],
+        trim: true
     },
-    gender: {
+    mess: {
         type: String,
-        enum: ['Male', 'Female', 'Other'],
-        required: true
+        default: null
+    },
+    block: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'HostelBlock',
+        default: null
     },
     room: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Room'
+        ref: 'Room',
+        default: null
     },
-    hostelBlock: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'HostelBlock'
-    },
-    messType: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Mess'
-    },
-    gym: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Gym'
-    },
-    payments: {
+    fees: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Fee'
-    },
+    }],
     complaints: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Complaints'
+        ref: 'Complaint'
     }],
     leaves: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Leaves'
+        ref: 'Leave'
     }],
     feedback: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -79,9 +86,16 @@ const studentSchema = new mongoose.Schema({
     }],
     role: {
         type: String,
-        default: 'student'
+        required: true,
+        default: 'student',
     }
-}, { timestamps: true });
+}, {
+    timestamps: true
+});
 
-// Proper Export Statement
-module.exports = mongoose.models.Student || mongoose.model('Student', studentSchema);
+// Add indexes for frequently queried fields
+studentSchema.index({ studentId: 1, email: 1 });
+
+const Student = mongoose.models.Student || mongoose.model('Student', studentSchema);
+
+export default Student;

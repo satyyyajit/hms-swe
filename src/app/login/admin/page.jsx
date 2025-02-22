@@ -31,7 +31,16 @@ const AdminLoginPage = () => {
                 setError(response.data.message || 'Login failed.');
             }
         } catch (error) {
-            setError(error.response?.data?.message || 'An error occurred during login.');
+            if(error.response){
+                setError(error.response.data.message || 'Login failed.');
+            }
+            else if(error.request){
+                setError('Network error. Please check your connection.');
+            }
+            else{
+                setError('An unexpected error occurred.');
+            }
+            
         } finally {
             setLoading(false);
             setCredentials({ empId: '', password: '' });

@@ -49,6 +49,16 @@ const StudentRegisterPage = () => {
         try {
             console.log(formData);
             // Add your API call here
+            const res = await axios.post('/api/signup/student', formData);
+            console.log(res.data);
+            
+            if (res.data.success) {
+                router.push('/login/student');
+            }
+            else {
+                setError(res.data.message || 'An error occurred during registration.');
+            }
+
             
         } catch (err) {
             setError(err.response?.data?.message || 'An error occurred during registration.');

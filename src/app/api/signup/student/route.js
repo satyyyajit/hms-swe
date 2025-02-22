@@ -1,41 +1,46 @@
-import connectDb from '@/lib/db';
-import Student from '@/models/UserModels/Student';
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+import connectDb from "@/lib/db";
+import Student from "@/models/UserModels/Student";
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
-export async function POST(req) {
-    await connectDb();
+export const POST = async (req) => {
     try {
+        await connectDb();
         const body = await req.json();
-        const { name, studentId, year, email, password, dob, address, role, phoneNumber, parentPhoneNumber, gender, } = body;
+        console.log(body);
+        const { name, studentId, year, dob, email, password, phoneNumber, parentPhoneNumber
+            , address, mess, block, room, gender } = body;
 
-        const isStudentExist = await Student.findOne({ $or: [{ email }, { studentId }] });
-        if (isStudentExist) {
-            return new NextResponse(JSON.stringify({ success: false, message: 'Student with this email or student ID already exists.' }), { status: 400 });
+        if (!name || !studentId || !year || !dob || !email || !password || !phoneNumber || !parentPhoneNumber || !address || !gender) {
+            return new NextResponse(JSON.stringify({ success: false, message: "All fields are required" }), { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        if (isNaN(year) || year < 0) {
+            return new NextResponse(JSON.stringify({ success: false, message: "Invalid year provided" }), { status: 400 });
+        }
 
-        const createStudent = new Student({
-            name,
-            studentId,
-            year,
-            email,
-            password: hashedPassword,
-            dob,
-            phoneNumber,
-            parentPhoneNumber,
-            address,
-            role,
+
+        if (await Student.findOne({ studentId })) {
+            return new NextResponse(JSON.stringify({ success: false, message: "Student ID already exists" }), { status: 400 });
+        }
+        if (await Student
+            .findOne({ email })) {
+            return new NextResponse(JSON.stringify({ success: false, message: "Email already exists" }), { status: 400 });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const student = new Student({
+            name, studentId, year, dob, email, password: hashedPassword, phoneNumber, parentPhoneNumber, address, mess, block, room, gender
         });
 
-        await createStudent.save();
+        await student.save();
 
-        return new NextResponse(JSON.stringify({ success: true, message: 'Student registered successfully.' }), { status: 201 });
-        
+        return new NextResponse(JSON.stringify({ success: true, message: "Student registered successfully" }), { status: 200 });
     }
-    catch (error) {
-        return new NextResponse(JSON.stringify({ success: false, message: error.message }), { status: 500 });
-    }
+    catch (err) {
+        console.error(err);
+        return new NextResponse(JSON.stringify({ success: false, message: "An unexpected error occurred" }), { status: 500 });
 
+    }
 };

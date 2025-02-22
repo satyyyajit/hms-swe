@@ -2,6 +2,7 @@
 import { HomeIcon, ClipboardListIcon, MessageSquareIcon, AlertTriangleIcon, BellIcon, UtensilsIcon, DumbbellIcon, LogOutIcon, UserIcon, IndianRupee } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const sidebarData = [
     { title: 'Home', icon: HomeIcon, path: '/student/dashboard' },
@@ -18,6 +19,7 @@ const sidebarData = [
 
 const SideBar = () => {
     const pathname = usePathname();
+    const router = useRouter();
 
     return (
         <div className="h-[calc(100vh-5rem)]  text-black flex flex-col pl-2">
@@ -25,14 +27,14 @@ const SideBar = () => {
                 <ul className="space-y-1">
                     {sidebarData.map((item, index) => (
                         <li key={index}>
-                            <Link
-                                href={item.path}
+                            <button
+                                onClick={() => router.push(item.path)}
                                 className={`flex items-center gap-3 text-gray-900 p-3 rounded-md transition ${pathname === item.path ? 'bg-blue-100 font-semibold text-blue-500' : 'hover:bg-blue-200'
                                     }`}
                             >
                                 <item.icon size={20} className={`${pathname === item.path ? 'bg-blue-100 font-semibold text-blue-500' : 'hover:bg-blue-200'}`} />
                                 <span className="text-sm font-medium md:block hidden">{item.title}</span>
-                            </Link>
+                            </button>
                         </li>
                     ))}
                 </ul>

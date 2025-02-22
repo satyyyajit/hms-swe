@@ -3,6 +3,8 @@
 import { BedDoubleIcon, UsersIcon, BellIcon, AlertTriangleIcon, LogOutIcon, HomeIcon, UtensilsIcon, Activity } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Card = ({ title, count, icon: Icon }) => {
     return (
@@ -51,20 +53,47 @@ const Notices = () => {
 };
 
 const Dashboard = () => {
+    
+    const [user, setUser] = useState(null);
+    
+    
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token') || document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+                    const response = await axios.get('/api/student', {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    setUser(response.data);
+            }
+            catch (err) {
+                console.log('Error fetching user data:', err);
+    
+            }
+        }
+        fetchUser();
+    }, [])
+    
+     
+
+
     const stats = [
         {
             title: 'My Room',
-            count: '101',
+            count: user?.student.room || 'Not Assigned',
             icon: BedDoubleIcon
         },
         {
             title: 'My Block',
-            count: 'A-1',
+            count: user?.student.block || 'Not Assigned',
             icon: HomeIcon
         },
         {
             title: 'Mess Type',
-            count: 'Non-Veg',
+            count: user?.student.mess || 'Not Assigned',
             icon: UtensilsIcon
         },
     ];
@@ -75,7 +104,7 @@ const Dashboard = () => {
                 {/* Student Welcome Card */}
                 <div className='w-full rounded-3xl border border-gray-300 text-white bg-gradient-to-r from-gray-900 to-gray-800 p-8 shadow-xl text-center'>
                     <h1 className='text-3xl md:text-5xl font-extrabold mt-12'>
-                        Welcome Student!
+                        Welcome {user?.student.name}!
                     </h1>
                     <p className='text-gray-300 text-lg md:text-2xl font-medium mt-3'>
                         Manage your hostel stay, attendance, and complaints easily.

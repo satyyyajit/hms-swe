@@ -1,20 +1,26 @@
 import mongoose from "mongoose";
 
 const feedbackSchema = new mongoose.Schema({
-    student: {
-        type: mongoose.Schema.Types.ObjectId,
+    studentId: {
+        type: String,
         ref: 'Student',
         required: true
     },
-    feedback_description: {
+    description: {
         type: String,
         required: true
     },
-    feedbackType: {
+    type: {
         type: String,
-        enum: ['Mess', 'Gym', 'Hostel', 'Other'],
+        enum: ['mess', 'gym', 'hostel', 'other'],
+        required: true
+    },
+    star:{
+        type: Number,
         required: true
     }
 }, { timestamps: true });
 
-module.exports = mongoose.models.Feedback || mongoose.model('Feedback', feedbackSchema);
+const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', feedbackSchema);
+
+export default Feedback;
