@@ -17,15 +17,17 @@ const ComplaintSchema = new Schema({
         required: true
     },
     type: {
-        type: Number,
-        enum: [0, 1, 2], // 0 - mess, 1 - room, 2 - facility
-        default: 0
+        type: String,
+        enum: ['room', 'mess', 'gym', 'hostel'],
+        required: true
     },
     status: {
-        type: Number,
-        enum: [0, 1, 2], // 0 - pending, 1 - in progress, 2 - resolved
-        default: 0
+        type: String,
+        enum: ['pending','resolved'], 
+        default: 'pending'
     },
 }, { timestamps: true });
 
-module.exports = mongoose.models.Complaint || mongoose.model('Complaint', ComplaintSchema);
+const Complaint = mongoose.models.Complaint || mongoose.model('Complaint', ComplaintSchema);
+
+export default Complaint;

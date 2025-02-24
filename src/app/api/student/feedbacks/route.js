@@ -1,6 +1,7 @@
 import connectDb from "@/lib/db";
 import Feedback from "@/models/UtilityModels/Feedback";
 import Student from "@/models/UserModels/Student";
+
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -69,7 +70,7 @@ export const POST = async (req) => {
         // Update the student's feedbacks array
         await Student.findOneAndUpdate(
             { studentId },
-            { $push: { feedbacks: createdFeedback._id } },
+            { $push: { feedback: createdFeedback._id } },
             { new: true }
         );
 
@@ -86,3 +87,4 @@ export const POST = async (req) => {
         );
     }
 };
+

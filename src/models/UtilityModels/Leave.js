@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const leaveSchema = new mongoose.Schema({
-    student: {
-        type: mongoose.Schema.Types.ObjectId,
+    studentId: {
+        type: String,
         ref: 'Student',
         required: true
     },
@@ -36,9 +36,11 @@ const leaveSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected'],
-        default: 'Pending'
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
     }
 }, { timestamps: true });
 
-module.exports = mongoose.models.Leave || mongoose.model('Leave', leaveSchema);
+const Leave = mongoose.models.Leave || mongoose.model('Leave', leaveSchema);
+
+export default Leave;

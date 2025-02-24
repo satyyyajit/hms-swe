@@ -31,7 +31,7 @@ export const POST = async (req) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const student = new Student({
-            name, studentId, year, dob, email, password: hashedPassword, phoneNumber, parentPhoneNumber, address, mess, block, room, gender
+            name, studentId, year, dob, email, password: hashedPassword, phoneNumber, parentPhoneNumber, address, mess, block, room, gender, gym: null
         });
 
         await student.save();

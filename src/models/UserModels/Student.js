@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-
-
 const studentSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -88,12 +86,19 @@ const studentSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: 'student',
+    },
+    gym:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gym',
+        default: null
     }
 }, {
     timestamps: true
 });
 
 // Add indexes for frequently queried fields
+
+
 studentSchema.index({ studentId: 1, email: 1 });
 
 const Student = mongoose.models.Student || mongoose.model('Student', studentSchema);

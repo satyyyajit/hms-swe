@@ -2,11 +2,10 @@ import jwt from 'jsonwebtoken';
 
 // Verify JWT token
 export const verifyToken = (token) => {
-    try {
-        return jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-        return null;
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT secret key is not set.');
     }
+    return jwt.verify(token, process.env.JWT_SECRET);
 };
 
 // Get user from token

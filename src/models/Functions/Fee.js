@@ -1,28 +1,37 @@
+import mongoose from 'mongoose';
+
 const feeSchema = new mongoose.Schema({
-    student: {
-        type: mongoose.Schema.Types.ObjectId,
+    studentId: {
+        type: String,
         ref: 'Student',
         required: true
     },
     type: {
         type: String,
-        enum: ['HostelFee', 'GymFee', 'Fine', 'Other'],
+        enum: ['RoomMessFee', 'GymFee', 'Fine'],
         required: true
     },
     amount: {
         type: Number,
         required: true
     },
-    paymentDate: {
-        type: Date
-    },
+    
     status: {
         type: String,
-        enum: ['Pending', 'Paid'],
-        default: 'Pending'
+        enum: ['pending', 'paid'],
+        default: 'pending'
     },
     dueDate: {
         type: Date,
-        required: true
+        required: true,
+        default: () => {
+            const date = new Date();
+            date.setDate(date.getDate() + 30);
+            return date;
+        }
     }
 }, { timestamps: true });
+
+const Fee = mongoose.models.Fee || mongoose.model('Fee', feeSchema);
+
+export default Fee;

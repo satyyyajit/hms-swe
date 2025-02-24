@@ -15,8 +15,9 @@ const noticeSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    
 
-    adminName: {
+    admin: {
         type: String,
         ref: "Admin",
         required: true,
@@ -24,3 +25,5 @@ const noticeSchema = new mongoose.Schema({
 });
 
 const Notice = mongoose.models.Notice || mongoose.model("Notice", noticeSchema);
+
+export default Notice;

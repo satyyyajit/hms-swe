@@ -12,7 +12,7 @@ const feedbackSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['mess', 'gym', 'hostel', 'other'],
+        enum: ['mess', 'gym', 'hostel', 'room'],
         required: true
     },
     star:{

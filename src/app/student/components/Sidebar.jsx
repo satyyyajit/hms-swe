@@ -29,7 +29,7 @@ const SideBar = () => {
                         <li key={index}>
                             <button
                                 onClick={() => router.push(item.path)}
-                                className={`flex items-center gap-3 text-gray-900 p-3 rounded-md transition ${pathname === item.path ? 'bg-blue-100 font-semibold text-blue-500' : 'hover:bg-blue-200'
+                                className={`w-full flex items-center gap-3 text-gray-900 p-3 rounded-md transition ${pathname === item.path ? 'bg-blue-100 font-semibold text-blue-500' : 'hover:bg-blue-200'
                                     }`}
                             >
                                 <item.icon size={20} className={`${pathname === item.path ? 'bg-blue-100 font-semibold text-blue-500' : 'hover:bg-blue-200'}`} />

@@ -11,6 +11,7 @@ const AuthStudent = () => {
     });
     const [error, setError] = useState('');
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,6 +23,8 @@ const AuthStudent = () => {
             return;
         }
 
+        setLoading(true);
+
         try {
             const response = await axios.post('/api/login/student', formData);
             if (response.data.success) {
@@ -31,6 +34,7 @@ const AuthStudent = () => {
                 console.log('User:', user);
                 
                 router.push('/student/dashboard');
+
             } else {
                 setError(response.data.message || 'Login failed');
             }
@@ -44,6 +48,9 @@ const AuthStudent = () => {
             }
             console.error('Login error:', error);
         }
+        finally{
+            setLoading(false);
+        }
     };
 
     const handleChange = (e) => {
@@ -53,7 +60,7 @@ const AuthStudent = () => {
 
     return (
         <div className='flex justify-center items-center h-screen'>
-            <div className='bg-white rounded-2xl p-6 border border-gray-300 shadow-lg text-center w-full flex flex-col items-center hover:scale-105 transition-transform duration-300 max-w-xs'>
+            <div className='bg-white rounded-2xl p-6 border border-gray-300 shadow-lg text-center w-full flex flex-col items-center max-w-xs'>
                 <h1 className='text-xl md:text-2xl font-bold text-gray-900'>
                     Student Login
                 </h1>
@@ -81,9 +88,10 @@ const AuthStudent = () => {
                     />
                     <button
                         type='submit'
-                        className='w-full bg-blue-100 text-blue-400 p-3 rounded-lg mt-4 hover:bg-blue-200 transition-colors duration-300'
+                        className='w-full bg-blue-300 text-blue-500 font-semibold p-3 rounded-lg mt-4 hover:bg-blue-400 transition-colors duration-300'
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? 'Loading...' : 'Login'}
                     </button>
                 </form>
             </div>
