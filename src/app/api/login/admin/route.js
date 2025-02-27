@@ -41,6 +41,7 @@ export async function POST(req) {
         // Create JWT
         const token = jwt.sign({ 
             id: admin._id,
+            empId: admin.empId,
             role: admin.role,
             
         }, process.env.JWT_SECRET, {
@@ -53,7 +54,7 @@ export async function POST(req) {
             secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
             sameSite: 'strict', // Prevent CSRF attacks
             maxAge: 60 * 60, 
-            path: '/admin',
+            path: '/',
         });
 
         // Return response with the cookie header

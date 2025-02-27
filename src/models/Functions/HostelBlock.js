@@ -10,4 +10,6 @@ const HostelBlockSchema = new Schema({
 }, { timestamps: true
 });
 
-module.exports = mongoose.model('HostelBlock', HostelBlockSchema);
+const HostelBlock = mongoose.models.HostelBlock || mongoose.model('HostelBlock', HostelBlockSchema);
+
+export default HostelBlock;

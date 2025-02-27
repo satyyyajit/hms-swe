@@ -8,8 +8,7 @@ import Student from "@/models/UserModels/Student";
 import mongoose from "mongoose";
 
 export const POST = async (req) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    
     try {
         await connectDb();
 
@@ -88,22 +87,17 @@ export const POST = async (req) => {
                 gym: createGym._id,
                 $push: { fees: gymFee._id }
             },
-            { session }
         );
 
-        await gymFee.save({ session });
-        await createGym.save({ session });
+        await gymFee.save();
+        await createGym.save();
 
-        await session.commitTransaction();
-        session.endSession();
 
         return NextResponse.json(
             { success: true, message: "Gym subscription created successfully", createGym, student },
             { status: 200 }
         );
     } catch (err) {
-        await session.abortTransaction();
-        session.endSession();
         console.error("Error in POST /api/gym:", err);
 
         if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {

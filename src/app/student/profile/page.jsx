@@ -39,11 +39,24 @@ const ProfilePage = () => {
         fetchUser();
     }, []);
 
+    const [fee, setFee] = useState([]);
+
+    for(let i=0; i<user?.student.fees.length; i++){
+        if(user?.student.fees[i].status === 'Pending'){
+            setFee(fee => [...fee, user?.student.fees[i]]);
+        }
+    }
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+    }
+
     const student = {
         name: user?.student.name ,
         registrationNumber: user?.student.studentId,
         year: user?.student.year,
-        dateOfBirth: user?.student.dob,
+        dateOfBirth: formatDate(user?.student.dateOfBirth),
         email: user?.student.email,
         phoneNumber: user?.student.phoneNumber,
         parentNumber: user?.student.parentPhoneNumber,
@@ -51,8 +64,8 @@ const ProfilePage = () => {
         room: user?.student.room || 'Not Assigned',
         block: user?.student.block || 'Not Assigned',
         messtype: user?.student.mess || 'Not Assigned',
-        pending_fees: [],
-        complaints: [],
+        pending_fees: fee || [],
+        complaints:user?.student.complaints ||  [],
         attendance: []
     }
 

@@ -9,7 +9,7 @@ import axios from 'axios';
 const Card = ({ title, count, icon: Icon }) => {
     return (
         <div className='bg-white rounded-2xl p-6 border border-gray-300 shadow-lg text-center w-full flex flex-col items-center hover:scale-105 transition-transform duration-300'>
-            {Icon && <Icon size={50}  className="text-blue-500 mb-3" />}
+            {Icon && <Icon size={50} className="text-blue-500 mb-3" />}
             <h1 className='text-xl md:text-2xl font-bold text-gray-900'>
                 {title}
             </h1>
@@ -53,31 +53,31 @@ const Notices = () => {
 };
 
 const Dashboard = () => {
-    
+
     const [user, setUser] = useState(null);
-    
-    
+
+
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem('token') || document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
-                    const response = await axios.get('/api/student', {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    });
-                    setUser(response.data);
+                const response = await axios.get('/api/student', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setUser(response.data);
             }
             catch (err) {
                 console.log('Error fetching user data:', err);
-    
+
             }
         }
         fetchUser();
     }, [])
-    
-     
+
+
 
 
     const stats = [
@@ -100,7 +100,7 @@ const Dashboard = () => {
 
     return (
         <>
-            <main > 
+            <main >
                 {/* Student Welcome Card */}
                 <div className='w-full rounded-3xl border border-gray-300 text-white bg-gradient-to-r from-gray-900 to-gray-800 p-8 shadow-xl text-center'>
                     <h1 className='text-3xl md:text-5xl font-extrabold mt-12'>

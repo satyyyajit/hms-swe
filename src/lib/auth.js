@@ -1,21 +1,28 @@
 import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+
 
 // Verify JWT token
 export const verifyToken = (token) => {
-    if (!process.env.JWT_SECRET) {
-        throw new Error('JWT secret key is not set.');
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        return null;
     }
-    return jwt.verify(token, process.env.JWT_SECRET);
 };
 
-// Get user from token
-export const getUserFromToken = (token) => {
-    if (!token) return null;
-    return verifyToken(token);
+export const cookieParser = (req) => {
+    const cookieHeader = req.headers.get('cookie');
+    if (!cookieHeader) {
+        return null; // No cookies found
+    }
+
+    const token = cookieHeader
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+
+    return token || null; // Return token or null if not found
 };
 
-// decode JWT token
-export const decodeToken = (token) => {
-    return jwt.decode(token);
-};
 

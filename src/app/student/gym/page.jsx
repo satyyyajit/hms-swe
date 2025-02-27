@@ -141,6 +141,7 @@ const GymFacility = () => {
             try {
                 const response = await axios.get('/api/student/gym', { withCredentials: true });
                 if (response.data.existingSubscription) {
+                    console.log('Existing subscription:', response.data.existingSubscription);
                     setData(response.data.existingSubscription);
                     setApplied(true);
                 }

@@ -1,5 +1,5 @@
 'use client';
-import { HomeIcon, ClipboardListIcon, MessageSquareIcon, AlertTriangleIcon, BellIcon, UtensilsIcon, DumbbellIcon, LogOutIcon, UserIcon, IndianRupee } from 'lucide-react';
+import { HomeIcon, ClipboardListIcon, MessageSquareIcon, AlertTriangleIcon, BellIcon, UtensilsIcon, DumbbellIcon, LogOutIcon, UserIcon, IndianRupee, LucideHome, Home } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ const sidebarData = [
     { title: 'Gym Facilities', icon: DumbbellIcon, path: '/student/gym' },
     { title: 'Transactions', icon: IndianRupee, path: '/student/transactions' },
     { title: 'Leave Requests', icon: LogOutIcon, path: '/student/leave' },
+    { title: 'Room Booking', icon: Home, path: '/student/booking' },
     { title: 'Forgot Password', icon: ClipboardListIcon, path: '/student/forgotpassword' }
 ];
 

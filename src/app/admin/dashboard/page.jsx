@@ -67,7 +67,14 @@ const QuickActions = () => {
 
 const getDashboard = () => {
 
-    
+    useEffect(() => {
+        const fetchAdmin = async () => {
+            try{
+                const token = localStorage.getItem('token') || document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+                
+            }
+        };
+    },[]);
 
     return (
         <>

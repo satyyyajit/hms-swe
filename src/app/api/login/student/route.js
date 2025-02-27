@@ -60,11 +60,14 @@ export async function POST(req) {
             path: '/', 
         });
 
-        
-        const response = new NextResponse(
-            JSON.stringify({ success: true, message: 'Login successful.', token: token, student: student }),
-            { status: 200, headers: { 'Set-Cookie': cookie } }
+        // Create the response
+        const response = NextResponse.json(
+            { success: true, message: 'Login successful.', token: token, student: student },
+            { status: 200 }
         );
+
+        // Set the cookie in the response headers
+        response.headers.set('Set-Cookie', cookie);
 
         return response;
     } catch (err) {
