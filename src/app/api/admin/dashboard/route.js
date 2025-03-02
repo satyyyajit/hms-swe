@@ -2,6 +2,8 @@ import connectDb from "@/lib/db";
 import Admin from "@/models/UserModels/Admin";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import Student from "@/models/UserModels/Student";
+import Complaint from "@/models/UtilityModels/Complaint";
 
 export async function GET(req) {
     try {
@@ -23,20 +25,24 @@ export async function GET(req) {
             .find(row => row.startsWith('token='))
             ?.split('=')[1];
 
-        console.log('Token:', token);    
+        console.log('Token:', token); 
+        
+        
         if (!token) {
             return new NextResponse(
-                JSON.stringify({ success: false, message: 'Token not found in cookie.' }),
+                JSON.stringify({ success: false, message: 'token_not_found' }),
                 { status: 401 }
             );
         }
 
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('Decoded:', decoded);
-        console.log('Admin ID:', decoded.empId);
-        // Fetch the student details
-        const admin = await Admin.findOne({ _id: decoded.id }).select('-password'); // Exclude password
+        // console.log('Decoded:', decoded);
+
+        
+        // Find the user in the database
+        const admin = await Admin.findById(decoded.id);
+
         if (!admin) {
             return new NextResponse(
                 JSON.stringify({ success: false, message: 'Admin not found.' }),
@@ -44,11 +50,16 @@ export async function GET(req) {
             );
         }
 
+        console.log('Admin:', admin);
 
+        const getStudent = await Student.find();
+        // console.log(getStudent.length);
 
-        // Return the student details
+        const getComplaints = await Complaint.find();
+        // console.log(getComplaints.length);
+
         return new NextResponse(
-            JSON.stringify({ success: true, admin }),
+            JSON.stringify({ admin, numberOfStudents:getStudent.length, complaints:getComplaints.length ,success: true, message: 'Admin found.' }),
             { status: 200 }
         );
 

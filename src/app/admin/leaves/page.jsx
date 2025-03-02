@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const StatusBadge = ({ status }) => {
     const statusColors = {
@@ -12,29 +15,34 @@ const StatusBadge = ({ status }) => {
 };
 
 const LeaveRequests = ({ previousLeaves, handleApproval }) => {
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+    };
+
     return (
         <div className="mt-8 w-full bg-white shadow-md p-6 rounded-lg">
             <h2 className="text-2xl font-semibold mb-4 text-center">Leave Requests</h2>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-50 text-center">
                         <tr>
-                            {['Reg', 'Name', 'Phone', "Parent's Phone", 'Place', 'Reason', 'Start', 'End', 'Status', 'Action'].map(header => (
+                            {['StudentID', 'Phone', 'Place', 'Reason', 'Start', 'End', 'Status', 'Action'].map(header => (
                                 <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {previousLeaves.map(leave => (
-                            <tr key={leave.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-sm text-gray-900">{leave.registrationNo}</td>
-                                <td className="px-6 py-4 text-sm font-medium text-gray-900">{leave.name}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{leave.phoneNumber}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{leave.parentPhoneNumber}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{leave.place}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-[150px]">{leave.reason}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{leave.startDate} {leave.startTime}</td>
-                                <td className="px-6 py-4 text-sm text-gray-500">{leave.endDate} {leave.endTime}</td>
+                            <tr key={leave._id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 text-xs text-gray-900">{leave.studentId}</td>
+
+                                <td className="px-6 py-4 text-xs text-gray-500">{leave.phoneNumber}</td>
+                                <td className="px-6 py-4 text-xs text-gray-500">{leave.place}</td>
+                                <td className="px-6 py-4 text-xs text-gray-500 truncate max-w-[150px]">{leave.reason}</td>
+                                <td className="px-6 py-4 text-xs text-gray-500">{formatDate(leave.startDate)} {leave.startTime}</td>
+                                <td className="px-6 py-4 text-xs text-gray-500">{formatDate(leave.endDate)} {leave.endTime}</td>
                                 <td className="px-6 py-4"><StatusBadge status={leave.status} /></td>
                                 <td className="px-6 py-4">
                                     {leave.status === "Pending" && (
@@ -54,41 +62,120 @@ const LeaveRequests = ({ previousLeaves, handleApproval }) => {
 };
 
 function LeaveForm() {
+
+
     const [formData, setFormData] = useState({
-        name: '', registrationNo: '', phoneNumber: '', parentPhoneNumber: '', place: '', reason: '', startDate: '', endDate: '', startTime: '', endTime: ''
+        studentId: '', startDate: '', startTime: '', endDate: '', endTime: '', reason: '', place: '', phoneNumber: ''
     });
     const [previousLeaves, setPreviousLeaves] = useState([]);
-    
+    const [isLoading, setIsLoading] = useState(false);
+
+    const fetchPreviousLeaves = async () => {
+        try {
+            const response = await axios.get('/api/admin/leaves');
+            console.log(response.data.leaves);
+            setPreviousLeaves(response.data.leaves);
+        } catch (error) {
+            toast.error('An error occurred while fetching leave requests');
+        }
+    };
+
+    useEffect(() => {
+        fetchPreviousLeaves();
+    }, [])
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
-    
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setPreviousLeaves(prev => [...prev, { ...formData, id: prev.length + 1, status: "Pending" }]);
-        setFormData({ name: '', registrationNo: '', phoneNumber: '', parentPhoneNumber: '', place: '', reason: '', startDate: '', endDate: '', startTime: '', endTime: '' });
+        setIsLoading(true);
+
+        if (new Date(formData.startDate) > new Date(formData.endDate)) {
+            toast.error('Start date cannot be greater than end date');
+            setIsLoading(false);
+            return;
+        }
+
+        if (new Date(formData.startDate) === new Date(formData.endDate) && formData.startTime > formData.endTime) {
+            toast.error('Start time cannot be greater than end time');
+            setIsLoading(false);
+            return;
+        }
+
+        if (new Date(formData.startDate) < new Date()) {
+            toast.error('Start date cannot be in the past');
+            setIsLoading(false);
+            return;
+        }
+
+        if (new Date(formData.endDate) < new Date()) {
+            toast.error('End date cannot be in the past');
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/admin/leaves', formData);
+            console.log(response.data.leave);
+            if (response.data.success) {
+                toast.success(response.data.message);
+                setPreviousLeaves(prev => [...prev, response.data.leave]);
+                setFormData({
+                    studentId: '', startDate: '', startTime: '', endDate: '', endTime: '', reason: '', place: '', phoneNumber: ''
+                });
+
+            } else {
+                toast.error(response.data.message);
+            }
+
+
+        } catch (error) {
+            toast.error('An error occurred while submitting the leave application');
+        } finally {
+            setIsLoading(false);
+        }
     };
-    
-    const handleApproval = (id, status) => {
-        setPreviousLeaves(prevLeaves => prevLeaves.map(leave => leave.id === id ? { ...leave, status } : leave));
+
+    const handleApproval = async (id, status) => {
+        try {
+            
+        } catch (error) {
+            toast.error('An error occurred while updating the leave request');
+        }
     };
-    
+
     return (
+        <>
         <div className="flex flex-col items-center justify-center min-h-screen">
+        <ToastContainer />
+            
             <h1 className="text-3xl font-semibold mb-6 text-gray-800">Leave Application</h1>
-            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 w-full  border border-gray-300 text-sm">
+            <form onSubmit={handleSubmit} className="bg-white  rounded-lg p-6 w-full max-w-2xl border border-gray-300 text-sm">
                 <h2 className="text-xl font-semibold mb-4">Apply for Leave</h2>
-                {['name', 'registrationNo', 'phoneNumber', 'parentPhoneNumber', 'place', 'reason', 'startDate', 'startTime', 'endDate', 'endTime'].map((field, idx) => (
+                {['studentId', 'startDate', 'startTime', 'endDate', 'endTime', 'reason', 'place', 'phoneNumber'].map((field, idx) => (
                     <div key={idx} className="mb-4">
                         <label className="block text-gray-700 font-medium mb-2 capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}</label>
-                        <input type={field.includes('Date') ? 'date' : field.includes('Time') ? 'time' : 'text'} name={field} value={formData[field]} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-lg" placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`} required />
+                        <input
+                            type={field.includes('Date') ? 'date' : field.includes('Time') ? 'time' : 'text'}
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                            placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                            required
+                        />
                     </div>
                 ))}
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 w-full">Submit</button>
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 w-full" disabled={isLoading}>
+                    {isLoading ? 'Submitting...' : 'Submit'}
+                </button>
             </form>
             <LeaveRequests previousLeaves={previousLeaves} handleApproval={handleApproval} />
         </div>
+        </>
     );
 }
 

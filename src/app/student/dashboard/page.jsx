@@ -24,6 +24,9 @@ const Card = ({ title, count, icon: Icon }) => {
 
 
 const QuickActions = () => {
+
+    
+
     return (
         <div className='flex justify-center items-center mt-6 flex-col'>
             <h1 className='text-center md:text-left font-bold mt-6 text-gray-900 flex items-center gap-3 text-2xl mb-6'>
