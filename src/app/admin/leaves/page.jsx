@@ -7,15 +7,14 @@ import axios from 'axios';
 
 const StatusBadge = ({ status }) => {
     const statusColors = {
-        'Approved': 'bg-green-100 text-green-800',
-        'Pending': 'bg-yellow-100 text-yellow-800',
-        'Rejected': 'bg-red-100 text-red-800'
+        'approved': 'bg-green-100 text-green-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'rejected': 'bg-red-100 text-red-800'
     };
-    return <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}>{status}</span>;
+    return <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>{status}</span>;
 };
 
 const LeaveRequests = ({ previousLeaves, handleApproval }) => {
-
     const formatDate = (date) => {
         const d = new Date(date);
         return `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
@@ -37,7 +36,6 @@ const LeaveRequests = ({ previousLeaves, handleApproval }) => {
                         {previousLeaves.map(leave => (
                             <tr key={leave._id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 text-xs text-gray-900">{leave.studentId}</td>
-
                                 <td className="px-6 py-4 text-xs text-gray-500">{leave.phoneNumber}</td>
                                 <td className="px-6 py-4 text-xs text-gray-500">{leave.place}</td>
                                 <td className="px-6 py-4 text-xs text-gray-500 truncate max-w-[150px]">{leave.reason}</td>
@@ -45,10 +43,12 @@ const LeaveRequests = ({ previousLeaves, handleApproval }) => {
                                 <td className="px-6 py-4 text-xs text-gray-500">{formatDate(leave.endDate)} {leave.endTime}</td>
                                 <td className="px-6 py-4"><StatusBadge status={leave.status} /></td>
                                 <td className="px-6 py-4">
-                                    {leave.status === "Pending" && (
+                                    {leave.status === "pending" && (
                                         <div className="flex gap-2">
-                                            <button className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600" onClick={() => handleApproval(leave.id, "Approved")}>Approve</button>
-                                            <button className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600" onClick={() => handleApproval(leave.id, "Rejected")}>Reject</button>
+                                            <button className="bg-neutral-900 text-sm text-white px-4 py-1 rounded-md hover:bg-neutral-800"
+                                                onClick={() => handleApproval(leave._id, "approved")}>Approve</button>
+                                            <button className="bg-red-500 text-sm text-white px-2 py-1 rounded-md hover:bg-red-600"
+                                                onClick={() => handleApproval(leave._id, "rejected")}>Reject</button>
                                         </div>
                                     )}
                                 </td>
@@ -62,18 +62,16 @@ const LeaveRequests = ({ previousLeaves, handleApproval }) => {
 };
 
 function LeaveForm() {
-
-
     const [formData, setFormData] = useState({
         studentId: '', startDate: '', startTime: '', endDate: '', endTime: '', reason: '', place: '', phoneNumber: ''
     });
     const [previousLeaves, setPreviousLeaves] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    
 
     const fetchPreviousLeaves = async () => {
         try {
             const response = await axios.get('/api/admin/leaves');
-            console.log(response.data.leaves);
             setPreviousLeaves(response.data.leaves);
         } catch (error) {
             toast.error('An error occurred while fetching leave requests');
@@ -82,7 +80,7 @@ function LeaveForm() {
 
     useEffect(() => {
         fetchPreviousLeaves();
-    }, [])
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -93,45 +91,30 @@ function LeaveForm() {
         e.preventDefault();
         setIsLoading(true);
 
-        if (new Date(formData.startDate) > new Date(formData.endDate)) {
-            toast.error('Start date cannot be greater than end date');
+        const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+        const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+        const now = new Date();
+
+        if (startDateTime > endDateTime) {
+            toast.error('Start time must be before end time');
             setIsLoading(false);
             return;
         }
-
-        if (new Date(formData.startDate) === new Date(formData.endDate) && formData.startTime > formData.endTime) {
-            toast.error('Start time cannot be greater than end time');
-            setIsLoading(false);
-            return;
-        }
-
-        if (new Date(formData.startDate) < new Date()) {
+        if (startDateTime < now) {
             toast.error('Start date cannot be in the past');
-            setIsLoading(false);
-            return;
-        }
-
-        if (new Date(formData.endDate) < new Date()) {
-            toast.error('End date cannot be in the past');
             setIsLoading(false);
             return;
         }
 
         try {
             const response = await axios.post('/api/admin/leaves', formData);
-            console.log(response.data.leave);
             if (response.data.success) {
                 toast.success(response.data.message);
                 setPreviousLeaves(prev => [...prev, response.data.leave]);
-                setFormData({
-                    studentId: '', startDate: '', startTime: '', endDate: '', endTime: '', reason: '', place: '', phoneNumber: ''
-                });
-
+                setFormData({ studentId: '', startDate: '', startTime: '', endDate: '', endTime: '', reason: '', place: '', phoneNumber: '' });
             } else {
                 toast.error(response.data.message);
             }
-
-
         } catch (error) {
             toast.error('An error occurred while submitting the leave application');
         } finally {
@@ -141,7 +124,18 @@ function LeaveForm() {
 
     const handleApproval = async (id, status) => {
         try {
-            
+            const response = await axios.put(`/api/admin/leaves/`, { id, status });
+            if (response.data.success) {
+                toast.success(response.data.message);
+                setPreviousLeaves(prev => prev.map(leave => leave._id === id ? { ...leave, status } : leave));
+
+                return updatedLeaves.sort((a, b) => {
+                    const order = { "pending": 2, "rejected": 1, "approved": 0 };
+                    return order[a.status] - order[b.status];
+                });
+            } else {
+                toast.error(response.data.message);
+            }
         } catch (error) {
             toast.error('An error occurred while updating the leave request');
         }
@@ -149,11 +143,11 @@ function LeaveForm() {
 
     return (
         <>
+        
         <div className="flex flex-col items-center justify-center min-h-screen">
-        <ToastContainer />
-            
+            <ToastContainer />
             <h1 className="text-3xl font-semibold mb-6 text-gray-800">Leave Application</h1>
-            <form onSubmit={handleSubmit} className="bg-white  rounded-lg p-6 w-full max-w-2xl border border-gray-300 text-sm">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 w-full max-w-2xl border border-gray-300 text-sm">
                 <h2 className="text-xl font-semibold mb-4">Apply for Leave</h2>
                 {['studentId', 'startDate', 'startTime', 'endDate', 'endTime', 'reason', 'place', 'phoneNumber'].map((field, idx) => (
                     <div key={idx} className="mb-4">
@@ -164,7 +158,6 @@ function LeaveForm() {
                             value={formData[field]}
                             onChange={handleChange}
                             className="w-full p-3 border border-gray-300 rounded-lg"
-                            placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
                             required
                         />
                     </div>

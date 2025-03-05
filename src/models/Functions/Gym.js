@@ -2,9 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // delete schema again if it already exists, then recreate it
-if (mongoose.models.Gym) {
-    delete mongoose.models.Gym;
-}
 
 const gymSchema = new Schema({
     room: {

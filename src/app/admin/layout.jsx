@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 
 import SideBar from "./components/Sidebar";
 
+// this is the student layout where all functions related to student will be displayed and they can be accessed by the sidebar
 export default function StudentLayout({ children }) {
     return (
         <div className="w-full">

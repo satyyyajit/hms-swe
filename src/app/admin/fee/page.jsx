@@ -1,22 +1,24 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
-const transactions = [
-    { id: 1, transactionId: 'TXN1001', name: 'Alice Johnson', reg: '23BCE7300', amount: 500, date: '2025-02-08', status: 'Completed', category: 'Hostel Fee' },
-    { id: 2, transactionId: 'TXN1002', name: 'Bob Smith', reg: '23BCE7301', amount: 1200, date: '2025-02-09', status: 'Pending', category: 'Fine' },
-    { id: 3, transactionId: 'TXN1003', name: 'Charlie Brown', reg: '23BCE7302', amount: 800, date: '2025-02-07', status: 'Failed', category: 'Hostel Fee' }
-];
+
 
 const StatusBadge = ({ status }) => {
     const statusColors = {
-        'Completed': 'bg-green-100 text-green-800',
-        'Pending': 'bg-yellow-100 text-yellow-800',
-        'Failed': 'bg-red-100 text-red-800'
+        'completed': 'bg-green-100 text-green-800',
+        'pending': 'bg-yellow-100 text-yellow-800',
+        'failed': 'bg-red-100 text-red-800'
     };
-    return <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}>{status}</span>;
+
+    return <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status.toLowerCase()] || 'bg-gray-100 text-gray-800'}`}>
+        {status}
+    </span>;
 };
+
 
 const TransactionPage = () => {
     const [filters, setFilters] = useState({ date: '', minAmount: '', maxAmount: '', reg: '' });
@@ -26,13 +28,39 @@ const TransactionPage = () => {
         setFilters((prev) => ({ ...prev, [id]: value }));
     };
 
+    const [transactions, setTransactions] = useState([]);
+
+
+
     const filteredTransactions = transactions.filter(t => {
         const matchesDate = filters.date ? t.date === filters.date : true;
         const matchesMinAmount = filters.minAmount ? t.amount >= parseFloat(filters.minAmount) : true;
         const matchesMaxAmount = filters.maxAmount ? t.amount <= parseFloat(filters.maxAmount) : true;
-        const matchesReg = filters.reg ? t.reg.includes(filters.reg) : true;
+        const matchesReg = filters.studentId ? t.studentId.includes(filters.studentId) : true;
         return matchesDate && matchesMinAmount && matchesMaxAmount && matchesReg;
     });
+
+    useEffect(()=>{
+        const fetchTransactions = async () => {
+            try{
+                const response = await axios.get('/api/admin/fees');
+                console.log(response.data.fees);
+                setTransactions(response.data.fees);
+
+            }
+            catch(error){
+                toast.error('An error occurred while fetching transactions');
+            
+            }
+        }
+        fetchTransactions();
+    },[])
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+    }
+
 
     return (
         <div className=" bg-white">
@@ -42,14 +70,14 @@ const TransactionPage = () => {
                 <input type="date" id="date" value={filters.date} onChange={handleChange} className="p-2 border rounded-md" />
                 <input type="number" id="minAmount" placeholder="Min Amount" value={filters.minAmount} onChange={handleChange} className="p-2 border rounded-md" />
                 <input type="number" id="maxAmount" placeholder="Max Amount" value={filters.maxAmount} onChange={handleChange} className="p-2 border rounded-md" />
-                <input type="text" id="reg" placeholder="Search by Reg No" value={filters.reg} onChange={handleChange} className="p-2 border rounded-md" />
+                <input type="text" id="studentId" placeholder="Search by Student ID" value={filters.studentId} onChange={handleChange} className="p-2 border rounded-md" />
             </div>
             
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                     <thead className="bg-gray-50">
                         <tr>
-                            {['Transaction ID', 'Name', 'Reg No', 'Amount', 'Date', 'Category', 'Status'].map(header => (
+                            {['Transaction ID', 'Student ID', 'Amount', 'Date', 'Category', 'Status'].map(header => (
                                 <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{header}</th>
                             ))}
                         </tr>
@@ -57,12 +85,11 @@ const TransactionPage = () => {
                     <tbody className="divide-y divide-gray-200">
                         {filteredTransactions.map(transaction => (
                             <tr key={transaction.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.transactionId}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.reg}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${transaction.amount}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.category}</td>
+                                <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{transaction._id}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.studentId}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹{transaction.amount}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(transaction.updatedAt)}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.type}</td>
                                 <td className="px-6 py-4 whitespace-nowrap"><StatusBadge status={transaction.status} /></td>
                             </tr>
                         ))}
