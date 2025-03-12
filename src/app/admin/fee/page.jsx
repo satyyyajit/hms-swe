@@ -84,7 +84,7 @@ const TransactionPage = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {filteredTransactions.map(transaction => (
-                            <tr key={transaction.id} className="hover:bg-gray-50">
+                            <tr key={transaction._id} className="hover:bg-gray-50">
                                 <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{transaction._id}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.studentId}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹{transaction.amount}</td>

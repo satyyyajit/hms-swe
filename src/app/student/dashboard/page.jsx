@@ -86,17 +86,17 @@ const Dashboard = () => {
     const stats = [
         {
             title: 'My Room',
-            count: user?.student.room || 'Not Assigned',
+            count: user?.roomNumber || 'Not Assigned',
             icon: BedDoubleIcon
         },
         {
             title: 'My Block',
-            count: user?.student.block || 'Not Assigned',
+            count: user?.blockName || 'Not Assigned',
             icon: HomeIcon
         },
         {
             title: 'Mess Type',
-            count: user?.student.mess || 'Not Assigned',
+            count: user?.mess || 'Not Assigned',
             icon: UtensilsIcon
         },
     ];

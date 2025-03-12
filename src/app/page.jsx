@@ -178,7 +178,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Building2Icon className="h-6 w-6 text-primary" />
-                <h3 className="font-bold">VST Hostel Management</h3>
+                <h3 className="font-bold">Hostel Management</h3>
               </div>
               <p className="text-muted-foreground">
                 Providing efficient hostel management solutions for educational institutions.
@@ -191,7 +191,6 @@ export default function Home() {
                 <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Home</Link></li>
                 <li><Link href="#features" className="text-muted-foreground hover:text-primary transition-colors">Features</Link></li>
                 <li><Link href="#login-section" className="text-muted-foreground hover:text-primary transition-colors">Login</Link></li>
-                <li><Link href="#contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
               </ul>
             </div>
             
@@ -201,7 +200,7 @@ export default function Home() {
           </div>
           
           <div className="mt-12 pt-8 border-t border-border text-center text-muted-foreground">
-            <p>© {new Date().getFullYear()} VST Hostel Management System. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Hostel Management System.</p>
           </div>
         </div>
       </footer>

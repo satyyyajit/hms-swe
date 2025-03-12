@@ -75,7 +75,7 @@ export const POST = async (req, res) => {
         await Student.findOneAndUpdate({ studentId: studentId }, { $push: { complaints: createComplaint._id } });
         
         return new NextResponse(
-            JSON.stringify({ success: true, message: 'Complaint submitted successfully.' }),
+            JSON.stringify({ success: true, message: 'Complaint submitted successfully.', complaint: createComplaint }),
             { status: 200 }
         );
     }

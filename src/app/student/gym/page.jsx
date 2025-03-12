@@ -21,6 +21,19 @@ const PostGym = ({ onBook, isSubmitting, error }) => {
         onBook(formData);
     };
 
+    useEffect(() => {
+        const fetchStudentId = async () => {
+            try {
+                const response = await axios.get('/api/student');
+                console.log(response.data.student.studentId);
+                setFormData((prev) => ({ ...prev, studentId: response.data.student.studentId }));
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchStudentId();
+    },[]);
+
     return (
         <div className="flex flex-col items-center justify-center p-6">
             <h1 className="text-3xl font-semibold mb-6">Gym Facility</h1>
@@ -35,6 +48,7 @@ const PostGym = ({ onBook, isSubmitting, error }) => {
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter your student ID"
                         required
+                        disabled
                     />
 
                     <label className="block text-gray-700 font-medium">Time Slot</label>
@@ -141,9 +155,10 @@ const GymFacility = () => {
             try {
                 const response = await axios.get('/api/student/gym', { withCredentials: true });
                 if (response.data.existingSubscription) {
-                    console.log('Existing subscription:', response.data.existingSubscription);
                     setData(response.data.existingSubscription);
                     setApplied(true);
+                } else if (response.data.student && response.data.message === "can_register") {
+                    setApplied(false);
                 }
             } catch (err) {
                 console.error(err);
@@ -154,9 +169,14 @@ const GymFacility = () => {
         fetchSubscription();
     }, []);
 
-    return (
-        <>{isLoading ? <Loading /> : applied ? <ActiveSubscription obj={data} /> : <PostGym onBook={handleBook} isSubmitting={isLoading} error={error} />}</>
-    );
-};
+    if (isLoading) {
+        return <Loading />;
+    }
 
+    if (applied && data) {
+        return <ActiveSubscription obj={data} />;
+    }
+
+    return <PostGym onBook={handleBook} isSubmitting={isLoading} error={error} />;
+};
 export default GymFacility;

@@ -6,16 +6,33 @@ const attendanceSchema = new mongoose.Schema({
         ref: 'Student',
         required: true
     },
+    room: {
+        type: String,
+        ref: 'Room',
+        required
+    },
+    block: {
+        type: String,
+        required: true
+    },
     date: {
         type: Date,
         required: true
     },
     status: {
         type: String,
-        enum: ['Present', 'Absent', 'Leave'],
+        enum: ['present', 'absent', 'leave'],
         required: true
+    },
+    takenBy: {
+        type: String,
+        required: true,
+
     }
+
 }, { timestamps: true });
 
 
-module.exports = mongoose.models.Attendance || mongoose.model('Attendance', attendanceSchema);
+const Attendance = mongoose.models.Attendance || mongoose.model('Attendance', attendanceSchema);
+
+export default Attendance;

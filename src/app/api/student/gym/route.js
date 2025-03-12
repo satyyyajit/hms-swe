@@ -2,10 +2,8 @@ import connectDb from "@/lib/db";
 import Gym from "@/models/Functions/Gym";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { parse } from "cookie";
 import Fee from "@/models/Functions/Fee";
 import Student from "@/models/UserModels/Student";
-import mongoose from "mongoose";
 
 export const POST = async (req) => {
     
@@ -149,19 +147,20 @@ export const GET = async (req) => {
         }
 
         const existingSubscription = await Gym.findOne({ studentId });
-        if (!existingSubscription) {
+        const student = await Student.findOne({ studentId });
+
+        if (!existingSubscription && student && !student.gym) {
             return NextResponse.json(
-                { error: "No gym subscription found" },
-                { status: 404 }
+                { student, message: "can_register", success: true },
+                { status: 200 }
             );
         }
 
-        const student = await Student.findOne({ studentId });
-
         return NextResponse.json(
-            { existingSubscription, student },
+            { existingSubscription, student, success: true },
             { status: 200 }
         );
+
     } catch (err) {
         console.error("Error in GET /api/gym:", err);
 

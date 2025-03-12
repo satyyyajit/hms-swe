@@ -15,7 +15,6 @@ const sidebarData = [
     { title: 'Transactions', icon: IndianRupee, path: '/student/transactions' },
     { title: 'Leave Requests', icon: LogOutIcon, path: '/student/leave' },
     { title: 'Room Booking', icon: Home, path: '/student/booking' },
-    { title: 'Forgot Password', icon: ClipboardListIcon, path: '/student/forgotpassword' }
 ];
 
 const SideBar = () => {

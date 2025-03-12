@@ -12,6 +12,7 @@ export async function POST(req) {
         const body = await req.json();
         const { empId, password } = body;
 
+        // console.log(body);              // Log the request body
         // Validate input
         if (!empId || !password) {
             return new NextResponse(
@@ -67,7 +68,8 @@ export async function POST(req) {
     } catch (error) {
         return new NextResponse(
             JSON.stringify({ success: false, message: error.message }),
-            { status: 500 }
+            { status: 500 }         
         );
-    }
-}
+    }                                                                                                   
+}       
+                                                                                                                                                                                                                                                                                                                                                                                                        

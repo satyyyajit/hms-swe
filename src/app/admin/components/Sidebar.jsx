@@ -24,7 +24,6 @@ const sidebarData = [
     { title: 'Mess Menu', icon: UtensilsIcon, path: '/admin/add_menu' },
     { title: 'Facilities', icon: DumbbellIcon, path: '/admin/facility' },
 
-    { title: 'Forgot Password', icon: ClipboardListIcon, path: '/admin/forgotpassword' },
 ];
 
 const SideBar = () => {

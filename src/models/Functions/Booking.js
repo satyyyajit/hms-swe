@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 
+
+
 const bookingSchema = new mongoose.Schema({
     room: {
         type: String,
         required: true,
         trim: true,
         ref: 'Room',
-        unique: true
     },
     roomId:{
         type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +21,7 @@ const bookingSchema = new mongoose.Schema({
     messType:{
         type: String,
         required: true,
-        enum: ['veg','non-veg']
+        enum: ['Veg','NonVeg']
     },
     email:{
         type: String,
@@ -42,19 +43,23 @@ const bookingSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['approved','pending' , 'rejected'],
+        enum: ['approved','pending'],
         default: 'pending'
     },
-    approvedBy: {
-        type: String,
-        ref: 'Admin'
-    },
-    approvalDate: {
-        type: Date,
-        required: true,
+
+    transactionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref: 'Fee',
         default: null
     },
+
+    active:{
+        type: Boolean,
+        default: true
+    },
 }, { timestamps: true });
+
 
 const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
 

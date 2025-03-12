@@ -1,5 +1,8 @@
 import connectDb from "@/lib/db";
 import Student from "@/models/UserModels/Student";
+import Room from "@/models/Functions/Room";
+import Booking from "@/models/Functions/Booking";
+import Block from "@/models/Functions/HostelBlock";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -42,9 +45,23 @@ export async function GET(req) {
         }
 
 
+        let blockName = '';
+        let roomNumber = '';
+        let mess = '';
+        
+
+        if(student.room || student.block || student.mess){
+            const block = await Block.findOne({ _id: student.block });
+            blockName = block.blockName;
+            const room = await Room.findOne({ _id: student.room });
+            roomNumber = room.roomNumber;
+            mess = student.mess;
+        }
+
+
         // Return the student details
         return new NextResponse(
-            JSON.stringify({ success: true, student }),
+            JSON.stringify({ success: true, student, blockName, roomNumber, mess }),
             { status: 200 }
         );
 
